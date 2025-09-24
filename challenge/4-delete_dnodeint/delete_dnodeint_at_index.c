@@ -1,46 +1,50 @@
 #include "lists.h"
+#include <stdlib.h>
 
 /**
- * delete_dnodeint_at_index - delete the node at index of a dlistint_t list
- * @head: head of the list
- * @index: index of the node that should be deleted. Index starts at 0
+ * delete_dnodeint_at_index - Delete a node at a specific index from a list
  *
- * Return: 1 if it succeeded, -1 if it failed
+ * @head: A pointer to the first element of a list
+ * @index: The index of the node to delete
+ *
+ * Return: 1 on success, -1 on failure
  */
 int delete_dnodeint_at_index(dlistint_t **head, unsigned int index)
 {
-    dlistint_t *h1;
+	dlistint_t *current;
+	unsigned int i;
 
-    if (*head == NULL)
-        return (-1);
+	if (head == NULL || *head == NULL)
+		return (-1);
 
-    h1 = *head;
+	current = *head;
 
-    if (index == 0)
-    {
-        *head = h1->next;
-        if (*head != NULL)
-            (*head)->prev = NULL;
-        free(h1);
-        return (1);
-    }
+	/* Special case: delete the first node (index 0) */
+	if (index == 0)
+	{
+		*head = current->next;
+		if (*head != NULL)
+			(*head)->prev = NULL;
+		free(current);
+		return (1);
+	}
 
-    while (index != 0)
-    {
-        h1 = h1->next;
-        if (h1 == NULL)
-            return (-1);
-        index--;
-    }
+	/* Traverse to the node at the given index */
+	for (i = 0; i < index && current != NULL; i++)
+	{
+		current = current->next;
+	}
 
-    if (h1 == NULL)
-        return (-1);
+	/* If we reached the end before finding the index */
+	if (current == NULL)
+		return (-1);
 
-    if (h1->next != NULL)
-        h1->next->prev = h1->prev;
-    if (h1->prev != NULL)
-        h1->prev->next = h1->next;
-    
-    free(h1);
-    return (1);
+	/* Update the links of neighboring nodes */
+	if (current->prev != NULL)
+		current->prev->next = current->next;
+	if (current->next != NULL)
+		current->next->prev = current->prev;
+
+	free(current);
+	return (1);
 }
